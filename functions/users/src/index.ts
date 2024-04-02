@@ -19,14 +19,8 @@ app.get("/test", async (req, res) => {
   res.send("connected to db");
 });
 
-const handleRequest = (req: Request, res: Response, next: NextFunction) => {
-  app(req, res, next);
-};
-
-export { handleRequest };
-
 // NOTE: for local testing
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
 });
