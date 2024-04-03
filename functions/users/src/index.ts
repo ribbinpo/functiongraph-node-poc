@@ -1,23 +1,27 @@
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
 import "dotenv/config";
 
 import { connect, close } from "../../../shares/configs/mongo.config";
 
 const app = express();
 
-app.get("/", (req, res) => {
+app.get("/test1/", (req, res) => {
   res.send("Server is running:)");
 });
 
-app.post("/", (req, res) => {
+app.post("/test1/", (req, res) => {
   res.send(req.body);
 });
 
-app.get("/test", async (req, res) => {
-  const { client } = await connect("mongodb+srv://baba:387XtFXJx34yc1ei@clusterbaba.c5zrn4a.mongodb.net/?retryWrites=true&w=majority", "chat-room");
+app.get("/test1/test", async (req, res) => {
+  const { client } = await connect(process.env.MONGO_URI, "chat-room");
   if (client) await close(client);
   res.send("connected to db");
 });
+
+app.get("/test1/test-env", (req, res) => {
+  res.send(process.env.test);
+})
 
 // NOTE: for local testing
 const PORT = process.env.PORT || 8000;
