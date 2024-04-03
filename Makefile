@@ -6,6 +6,7 @@ ifdef function
 ifeq ($(AVIABLE_FUNCTIONS), true)
 build:
 	@echo "[1]: Building..."
+	npm --prefix $(FUNCTION_PATH) install
 	npm --prefix $(FUNCTION_PATH) run build
 	@echo "[2]: Create bootstrap file"
 	@echo "/opt/function/runtime/nodejs$(NODE_VERSION)/rtsp/nodejs/bin/node \$$RUNTIME_CODE_ROOT/dist/functions/$(function)/src/index.js" > $(FUNCTION_PATH)/bootstrap
