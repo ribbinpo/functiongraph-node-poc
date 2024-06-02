@@ -11,6 +11,7 @@ while shared code, configurations, and adapters reside in the `shares/` director
 │   ├── function2/    # Function 2
 │   └── ...           # Other functions
 ├── shares/           # Shared code, config, adapter
+├── index.ts          # Run every module to the monolith
 ├── Makefile          # Makefile for building and compressing functions
 └── README.md         # This file
 ```
@@ -19,13 +20,25 @@ To deploy functions to Huawei CloudFunction using FunctionGraph, follow these st
 
 Install dependencies:
 
-```bash
+```sh
 npm install
 ```
 
+Init new module
+
+```sh
+make init [function_name]
+```
+Create a new module to `functions/` using `templates/` module to a template. (so you can modify your template in this module)
+
 Build and compress functions:
 
-```bash
-make build
+```sh
+make build [function_name]
 ```
 Once the build process is complete, upload the generated zip files to FunctionGraph using the Huawei Cloud Console.
+
+```sh
+make build-all
+```
+It similar with `make build` but this command will build every module in `functions/` and zip to `out/` folder.
