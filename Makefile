@@ -24,6 +24,31 @@ build:
 	@echo "Error: please declare your function name"
 endif
 
+
+.PHONY: build-all
+NODE_VERSION := 18.15
+FUNCTION_DIRS := $(wildcard ./functions/*/)
+build-all:
+	@echo "--- Starting Build Process ---"
+	@for function_dir in $(FUNCTION_DIRS); do \
+			function=$$(basename $$function_dir); \
+			echo "--- Start Building $$function Function ---"; \
+			if [ -d "$$function_dir" ]; then \
+					echo "[1]: Building $$function..."; \
+					npm --prefix $$function_dir ci; \
+					npm --prefix $$function_dir run build; \
+					echo "[2]: Creating bootstrap file for $$function"; \
+					echo "/opt/function/runtime/nodejs$(NODE_VERSION)/rtsp/nodejs/bin/node \$$RUNTIME_CODE_ROOT/dist/functions/$$function/src/index.js" > $$function_dir/bootstrap; \
+					echo "[3]: Zipping files for $$function"; \
+					mkdir -p ./out; \
+					cd $$function_dir && zip -r ../../out/$$function.zip ./dist ./node_modules ./package.json ./package-lock.json ./bootstrap && cd -; \
+					echo "--- Done Building $$function ---"; \
+			else \
+					echo "Error: Folder $$function_dir does not exist"; \
+			fi \
+	done
+	@echo "--- Build Process Completed ---"
+
 .PHONY: init
 ALREADY_EXIST := $(shell if [ -d "functions/$(function)" ]; then echo true; else echo false; fi)
 FUNCTION_PATH := ./functions/$(function)/
@@ -35,18 +60,30 @@ init:
 	@echo "[1]: Setup npm scripts..."
 	@cd $(FUNCTION_PATH) && npm init -y
 	@cd $(FUNCTION_PATH) && npm pkg set 'scripts.build'='npx tsc'
-	@cd $(FUNCTION_PATH) && npm pkg set 'scripts.start'='node dist/functions/users/src/index.js'
+	@cd $(FUNCTION_PATH) && npm pkg set 'scripts.start'='node dist/functions/$(function)/src/index.js'
 	@cd $(FUNCTION_PATH) && npm pkg set 'scripts.dev'='nodemon'
 	@echo "[2]: Install package..."
 	@cd $(FUNCTION_PATH) && npm i express
 	@cd $(FUNCTION_PATH) && npm i -D @types/express
 	@cd $(FUNCTION_PATH) && npm i dotenv
+	@cd $(FUNCTION_PATH) && npm i cors
+	@cd $(FUNCTION_PATH) && npm i -D @types/cors
+	@cd $(FUNCTION_PATH) && npm i express-validator
 	@echo "[3]: Clone template files..."
-	@cp -r ./functions/templates/src/* $(FUNCTION_PATH)
+	@cp -r ./functions/templates/src $(FUNCTION_PATH)
 	@cp -r ./functions/templates/nodemon.json $(FUNCTION_PATH)
 	@cp -r ./functions/templates/tsconfig.json $(FUNCTION_PATH)
+	@cp -r ./functions/templates/bootstrap $(FUNCTION_PATH)
 	@echo "PORT=8000" > $(FUNCTION_PATH)/.env
+	@cd $(FUNCTION_PATH)src/ && sed 's/templates/$(function)/' index.ts > index.new.ts
+	@cd $(FUNCTION_PATH)src/ && mv index.ts index.old.ts
+	@cd $(FUNCTION_PATH)src/ && mv index.new.ts index.ts
+	@cd $(FUNCTION_PATH)src/ && rm index.old.ts 
 	@echo "--- Done ---"
+	@echo "--- Please add this to index.ts in root for easy to test in local environment ---"
+	@echo 'import import $(function)Router from "./functions/$(function)/src/routes";'
+	@echo 'app.use("/$(function)", $(function)Router);'
+	@echo "--- End ---"
 else
 init:
 	@echo "Error: $(function) function already exist"
