@@ -1,29 +1,24 @@
 import express from "express";
+import cors from "cors";
 import "dotenv/config";
 
-import { connect, close } from "../../../shares/configs/mongo.config";
+import router from "./routes";
+
+import { errorHandler } from "../../../shares/middlewares/error.middleware";
 
 const app = express();
 
-app.get("/test1/", (req, res) => {
-  res.send("Server is running:)");
+app.use(express.json());
+app.use(cors());
+
+app.get("/templates/health-check", (_, res) => {
+  res.status(200).send("Server is running :)");
 });
 
-app.post("/test1/", (req, res) => {
-  res.send(req.body);
-});
+app.use("/templates", router);
 
-app.get("/test1/test", async (req, res) => {
-  const { client } = await connect(process.env.MONGO_URI, "chat-room");
-  if (client) await close(client);
-  res.send("connected to db");
-});
+app.use(errorHandler);
 
-app.get("/test1/test-env", (req, res) => {
-  res.send(process.env.test);
-})
-
-// NOTE: for local testing
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
