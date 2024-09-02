@@ -1,10 +1,22 @@
 import { Request, Response, NextFunction } from "express";
 
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (err) {
-    console.error(err.stack);
-    res.status(500).json({ message: err.message });
+import { ErrorHandler } from "../utils/response";
+
+export const errorMiddleware = (
+  err: Error | ErrorHandler,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (err instanceof ErrorHandler) {
+    return res.status(err.statusCode).json({
+      status: "Error",
+      statusCode: err.statusCode,
+      message: err.message,
+    });
   } else {
-    next();
+    return res
+      .status(500)
+      .json({ status: "Error", statusCode: 500, message: err.message });
   }
-}
+};
