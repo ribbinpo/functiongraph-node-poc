@@ -4,7 +4,7 @@ import "dotenv/config";
 
 import templateRouter from "./functions/templates/src/routes/index";
 
-import { errorMiddleware } from "./shares/middlewares/error.middleware";
+import { errorHandler } from "./shares/middlewares/error.middleware";
 
 const app = express();
 
@@ -17,7 +17,7 @@ app.get("/health-check", (req, res) => {
   res.status(200).send("Server is running :)");
 });
 
-app.use(errorMiddleware);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
