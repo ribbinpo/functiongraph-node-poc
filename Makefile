@@ -24,7 +24,6 @@ build:
 	@echo "Error: please declare your function name"
 endif
 
-
 .PHONY: build-all
 NODE_VERSION := 18.15
 FUNCTION_DIRS := $(wildcard ./functions/*/)
@@ -73,12 +72,20 @@ init:
 	@cp -r ./functions/templates/src $(FUNCTION_PATH)
 	@cp -r ./functions/templates/nodemon.json $(FUNCTION_PATH)
 	@cp -r ./functions/templates/tsconfig.json $(FUNCTION_PATH)
-	@cp -r ./functions/templates/bootstrap $(FUNCTION_PATH)
+	@cp -r ./functions/templates/Dockerfile $(FUNCTION_PATH)
+
 	@echo "PORT=8000" > $(FUNCTION_PATH)/.env
+	@echo "/opt/function/runtime/nodejs18.15/rtsp/nodejs/bin/node $RUNTIME_CODE_ROOT/dist/functions/$(function)/src/index.js" > $(FUNCTION_PATH)/bootstrap
+
 	@cd $(FUNCTION_PATH)src/ && sed 's/templates/$(function)/' index.ts > index.new.ts
 	@cd $(FUNCTION_PATH)src/ && mv index.ts index.old.ts
 	@cd $(FUNCTION_PATH)src/ && mv index.new.ts index.ts
-	@cd $(FUNCTION_PATH)src/ && rm index.old.ts 
+	@cd $(FUNCTION_PATH)src/ && rm index.old.ts
+
+	@cd $(FUNCTION_PATH) && sed 's/templates/$(function)/g' Dockerfile > Dockerfile.new
+	@cd $(FUNCTION_PATH) && mv Dockerfile Dockerfile.old
+	@cd $(FUNCTION_PATH) && mv Dockerfile.new Dockerfile
+	@cd $(FUNCTION_PATH) && rm Dockerfile.old
 	@echo "--- Done ---"
 	@echo "--- Please add this to index.ts in root for easy to test in local environment ---"
 	@echo 'import import $(function)Router from "./functions/$(function)/src/routes";'
