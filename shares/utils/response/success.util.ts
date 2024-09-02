@@ -20,7 +20,7 @@ class SuccessHandler<T> {
     this.message = message;
     this.result = result;
   }
-  handleSuccess = (res: Response) => {
+  handle = (res: Response) => {
     return res.status(this.statusCode).json({
       status: this.status,
       statusCode: this.statusCode,

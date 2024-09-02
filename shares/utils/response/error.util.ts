@@ -9,7 +9,7 @@ class ErrorHandler extends Error {
     this.message = message;
   }
 
-  handleError = (res: Response) => {
+  handle = (res: Response) => {
     res.status(this.statusCode).json({
       status: "Error",
       statusCode: this.statusCode,
