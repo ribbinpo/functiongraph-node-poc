@@ -1,7 +1,7 @@
 # Huawei CloudFunction POC with FunctionGraph
 This repository contains a Proof of Concept (POC) for implementing cloud functions in Huawei Cloud using the FunctionGraph feature.
 The project is structured with Node.js, Express.js, and TypeScript. Each function is developed separately within the `functions/` directory,
-while shared code, configurations, and adapters reside in the `shares/` directory. Additionally, a Makefile is provided to facilitate building cloud function, followed by compressing them into a zip file for upload to FunctionGraph.
+while shared code, configurations, and adapters reside in the `shares/` directory. Additionally, a Makefile is provided to facilitate building cloud function, followed by compressing them into a zip file for upload to FunctionGraph or build to docker image for push to container registry then sync with FunctionGraph.
 
 ## Project Structure
 ```bash
@@ -27,14 +27,14 @@ npm install
 Init new module
 
 ```sh
-make init [function_name]
+make init function=[function_name]
 ```
 Create a new module to `functions/` using `templates/` module to a template. (so you can modify your template in this module)
 
 Build and compress functions:
 
 ```sh
-make build [function_name]
+make build function=[function_name]
 ```
 Once the build process is complete, upload the generated zip files to FunctionGraph using the Huawei Cloud Console.
 
